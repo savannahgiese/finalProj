@@ -1,0 +1,59 @@
+body{
+  background-image: url("http://savvyg.me/Final_Project/background.png");
+}
+#wrap{
+	margin: 0 auto;
+	width: 600px;
+	background:#ccc;
+	border-radius: 20px;
+	text-align: center;
+}
+#header{
+	background:#FBE08F;
+	padding: 20px;
+}
+#header h1 { 
+  margin: 0; 
+  
+}
+#navigation{
+	float: left;
+	width: 600px;
+	background:#4F5C63;
+}
+#navigation ul{
+	margin: 0;
+	padding: 0;
+}
+#navigation ul li{
+	list-style-type: none;
+	display: inline;
+}
+#navigation li a{
+	display: block;
+	float: left;
+	padding: 5px 10px;
+	color:#060F2D;
+	text-decoration: none;
+	border-right: 1px solid#fff;
+}
+#navigation li a:hover {
+  background:#FFF; 
+}
+#content{
+	clear: left;
+	padding: 20px;
+}
+#content h2{
+	color:#060F2D;
+	font-size: 160%;
+	margin: 0 0 .5em;
+}
+#content p{
+  text-align: center;
+}
+#content fieldset{
+  text-align: center;
+  margin: auto;
+  color: #060F2D;
+}

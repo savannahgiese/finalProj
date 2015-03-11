@@ -1,0 +1,44 @@
+body{
+  background-image: url("http://savvyg.me/Final_Project/background.png");
+}
+#wrap{
+	margin: 0 auto;
+	width: 600px;
+	background:#ccc;
+	border-radius: 20px;
+	text-align: center;
+}
+
+#header{
+	background:#FBE08F;
+	padding: 20px;
+}
+
+#header h1 { 
+  margin: 0; 
+  
+}
+#content{
+	clear: left;
+	padding: 20px;
+}
+
+#content h2{
+	color:#060F2D;
+	font-size: 160%;
+	margin: 0 0 .5em;
+}
+
+#content p{
+  text-align: center;
+}
+
+#content fieldset{
+  text-align: center;
+  margin: auto;
+  color: #060F2D;
+}
+
+#error {
+	color: red;
+}
