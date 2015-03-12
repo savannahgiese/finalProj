@@ -18,8 +18,8 @@ if(isset($_SESSION['username']) && $_SESSION['username'] !='') {
 <body>
   <div id="wrap">
     <div id="header">
-      <h1>
-			Sherlock Trivia
+    <h1>
+		Sherlock Trivia
 		</h1>
     </div>
     <div id="content">

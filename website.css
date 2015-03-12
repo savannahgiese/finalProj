@@ -14,7 +14,6 @@ body{
 }
 #header h1 { 
   margin: 0; 
-  
 }
 #navigation{
 	float: left;
@@ -56,4 +55,42 @@ body{
   text-align: center;
   margin: auto;
   color: #060F2D;
+}
+#round{
+	clear: left;
+	padding: 20px;
+}
+#round h2{
+	color:#060F2D;
+	font-size: 160%;
+	margin: 0 0 .5em;
+}
+#round p{
+  text-align: center;
+}
+#round fieldset{
+  text-align: center;
+  margin: auto;
+  color: #060F2D;
+}
+#profilePic{
+	height:auto; 
+	width:auto; 
+	max-width:150px; 
+	max-height:150px;
+}
+#img {
+   width: 10em;  
+   height: 2em;
+   cursor:pointer;
+}
+.matches {
+    display:inline-block;
+    position:relative;
+    background-color: transparent;
+    cursor: pointer;
+    border:0;
+    padding:0;
+    color:#000;
+    text-decoration:underline;
 }

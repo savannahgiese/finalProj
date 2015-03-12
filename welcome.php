@@ -28,7 +28,7 @@ session_start();
 	       <li><a href=\"http://savvyg.me/Final_Project/user.php\">User</a></li>
 	       <li><a href=\"http://savvyg.me/Final_Project/play.php\">Play</a></li>
 	       <li><a href=\"http://savvyg.me/Final_Project/logout.php\">Logout</a></li></ul></div>
-	       <div id=\"content\"><p><img alt=\"Picture\" id=\"picture\" src=\"http://savvyg.me/Final_Project/tumblr_inline_ndcmyup8Cj1shcyx2.gif\"></p>
+	       <div id=\"content\"><p><img alt=\"Picture\" id=\"picture\" src=\"welcome.gif\"></p>
         <h2>Welcome, " . $_SESSION['username'] . "</h2></div>";
     }else{
         header("Location: http://savvyg.me/Final_Project/mainpage.php");
