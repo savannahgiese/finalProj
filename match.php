@@ -116,6 +116,7 @@ include 'database.php';
                 if($count == 0){
                     echo "Data does not exist.";   
                 }else{
+                    echo "Share with others: http://savvyg.me/Final_Project/match.php?userId=" . $user . "&mid=" . $match;
                     echo "<table>";
                     echo "<thead align=\"right\">";
                     echo "<tr>";
