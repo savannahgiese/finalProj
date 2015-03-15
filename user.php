@@ -3,7 +3,6 @@ error_reporting(-1);
 ini_set('display_errors', 'On');
 session_start();
 include 'database.php';
-$username = $_SESSION['username'];
 ?>
 
 <!DOCTYPE html>
@@ -18,15 +17,13 @@ $username = $_SESSION['username'];
 <body>
 <div id="wrap">
     <div id="header">
-		<h1>
-			Sherlock Trivia
-		</h1>
+		<h1>Sherlock Trivia</h1>
 	</div>
-	<div id="navigation">
     <?php 
     if(session_status() == PHP_SESSION_ACTIVE){
         if(isset($_SESSION['username']) && $_SESSION['username'] != NULL){
-            echo "<ul>
+            $username = $_SESSION['username'];
+            echo "<div id=\"navigation\"><ul>
     		<li><a href=\"http://savvyg.me/Final_Project/welcome.php\">Home</a></li>
     		<li><a href=\"http://savvyg.me/Final_Project/user.php\">User</a></li>
     		<li><a href=\"http://savvyg.me/Final_Project/play.php\">Play</a></li>
@@ -34,9 +31,24 @@ $username = $_SESSION['username'];
         }else {
             header("Location: http://savvyg.me/Final_Project/mainpage.php");
         }
-    }?>
-<form id="content">
-<?php 
+    }
+    
+if (!($stmt = $mysqli->prepare("SELECT `nickname` FROM `users` WHERE username = ?"))) {
+    echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+}
+if (!($stmt->bind_param("s", $username))){
+    echo "Binding parameters failed: (" . $mysqli->errno . ") " . $mysqli->error;
+}
+if (!$stmt->execute()) {
+    echo "Execute failed: (" . $mysqli->errno . ") " . $mysqli->error;
+}
+
+$stmt->bind_result($name);
+while ($stmt->fetch()) {
+    $nickname = $name;
+}
+echo "<br><div id=\"nickname\"><h2>" . $nickname . "</h2></div>";
+
 if (!($stmt = $mysqli->prepare("SELECT `picture` FROM `users` WHERE username = ?"))) {
     echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 }
@@ -65,18 +77,20 @@ if ($userPic == NULL){
         echo "Execute failed: (" . $mysqli->errno . ") " . $mysqli->error;
     }
     
-    echo "<div id=\"pic\"><p><img alt=\"Picture\" id=\"profilePic\" src=\"" . $userPic . "\"></p>";
+    echo "<div><img alt=\"Picture\" id=\"profilePic\" src=\"" . $userPic . "\"></div>";
     //echo "It worked!";
 //else it will display the users picture
 } else {
-    echo "<div id=\"pic\"><p><img alt=\"Picture\" id=\"profilePic\" src=\"" . $userPic . "\"></p>";
+    echo "<div><img alt=\"Picture\" id=\"profilePic\" src=\"" . $userPic . "\"></div>";
 }
 
 ?>
+<form id="content">
+<input type="submit" id="name" value="Change Nickname">
+<input type="submit" id="pic" value="Change Picture">
 </form>
-<button id="pic" onClick="updateProf()">Change Picture</button>
-<form id="results">
-    <h2 align='left'>Matches</h2>
+<div id="matches">
+<h2>Matches</h2>
 <?php
 if (!($stmt = $mysqli->prepare("SELECT `id` FROM `users` WHERE `username` = ?"))) {
     echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
@@ -92,10 +106,9 @@ $stmt->bind_result($id);
 while ($stmt->fetch()) {
     $userId = $id;
 }
-
 //echo $userId . "<br>";
 
-if (!($stmt = $mysqli->prepare("SELECT `id` FROM `match` WHERE `uid` = ?"))) {
+if (!($stmt = $mysqli->prepare("SELECT `matchNum`, `id` FROM `match` WHERE `uid` = ?"))) {
     echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
 }
 if (!($stmt->bind_param("i", $userId))){
@@ -105,65 +118,72 @@ if (!$stmt->execute()) {
     echo "Execute failed: (" . $mysqli->errno . ") " . $mysqli->error;
 }
 
-$stmt->bind_result($id);
-
-echo "<div align='left'>";
+$stmt->bind_result($num, $id);
 
 while ($stmt->fetch()) {
-    echo "<input class=\"matches\" type=\"submit\" value=\"Match #" . $id . "\"><br>";
+    //echo $tmp . "<br>";
+    echo "<a href=\"http://savvyg.me/Final_Project/match.php?userId=" . $userId . "&mid=" . $id . "\">Match #" . $num . "</a><br>";
 }
-
-echo "</div>";
-
+echo "</form><br><br>";
 $mysqli->close();
 ?>
-<div id="filter" align='left'>
-    <input class="matches" type="submit" value=""></button>
-</div>
-</form>
 </div>
 </div>
 <script>
-function updateProf() {
-    var pic = prompt("Please enter a url:");
-    console.log(pic);
-    if (pic != "") {
+$(document).on("click", ":submit", function(event){ 
+    event.preventDefault();
+    var val = $(this).val();
+    console.log(val);
+    if (val == 'Change Picture'){
+        var pic = prompt("Please enter a url:");
         console.log(pic);
-        $.ajax({
-            type: "POST",
-            url: 'updateProfile.php',
-            data: {
-            pic: pic
-            }
-            //done function to show result if user got it right or wrong
-        }).done(function(message){
-            var result = JSON.parse(message);
-            if (result.status == 'right') {
-              console.log(result.pic);
-              $('#pic').load("src", result.pic); 
-            }else if(result.status == 'wrong'){
-              console.log(result.pic);
-              $('#pic').load("src", result.pic); 
-            }
-        });
+        if((pic == '') || (pic == null)){
+            //console.log(pic);
+        }else{
+            //console.log(pic);
+            $.ajax({
+                type: "POST",
+                url: 'updateProfile.php',
+                data: {
+                pic: pic
+                }
+                //done function to show result if user got it right or wrong
+            }).done(function(message){
+                var result = JSON.parse(message);
+                console.log(result.pic);
+                var pic = result.pic;
+                //$('#profilePic').load("src", result.pic);
+                $('#profilePic').attr('src', pic);
+                //location.reload(true);
+            });
+        }
+    } else if (val == 'Change Nickname'){
+        var name = prompt("Please enter a new nickname:");
+        if((name == '') || (name == null)){
+            console.log(name);
+        }else{
+            console.log(name);
+            $.ajax({
+                type: "POST",
+                url: 'updateProfile.php',
+                data: {
+                name: name
+                }
+                //done function to show result if user got it right or wrong
+            }).done(function(message){
+                var result = JSON.parse(message);
+                console.log(result.name);
+                var name = result.name;
+                //$('#profilePic').load("src", result.pic);
+                $('#nickname').html("<h2>" + name + "</h2>");
+                //location.reload(true);
+            });
+        }
     }
-}
-</script>
-<script>
-$(document).ready(function() {
-    $("form").submit(function(event) { 
-        event.preventDefault();
-        var val = $("input[type=submit][clicked=true]").val();
-        console.log(val);
-        // DO WORK
-    });
-});
-</script>
-<script>
-$("form input[type=submit]").click(function() {
-    $("input[type=submit]", $(this).parents("form")).removeAttr("clicked");
-    $(this).attr("clicked", "true");
 });
 </script>
 </body>
 </html>
+
+
+});
