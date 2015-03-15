@@ -61,67 +61,37 @@ for($num = 0; $num < 20; $num++){
 }
 $questions = array();
 $answers = array();
-for($q = 0; $q < 20; $q++){
+for($q = 0; $q < 5; $q++){
     $tmp = $random[$q];
-    //echo $tmp . "<br>";
-    $sql = "SELECT * FROM `questions` WHERE `id` = '".$tmp."'";
-    $result = mysqli_query($mysqli,$sql);
-    $row = mysqli_fetch_array($result,MYSQLI_ASSOC); 
-    //echo "<label id='question'" . $row["question"] . "</label>";
-    array_push($questions, $row["question"]);
 
-    $anssql = "SELECT * FROM `answers` WHERE `qid` ='".$tmp."' ORDER BY rand()";
-    $resultans = mysqli_query($mysqli,$anssql);
-    while($rowans = mysqli_fetch_array($resultans,MYSQLI_ASSOC)) {
-        array_push($answers, $rowans["answer"]);
-    }
-}
-
-if (!($stmt = $mysqli->prepare("SELECT `id` FROM `users` WHERE username = ?"))) {
+    if (!($stmt = $mysqli->prepare("SELECT `question` FROM `questions` WHERE `id` = ?"))) {
     echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
-}
-if (!($stmt->bind_param("s", $username))){
-    echo "Binding parameters failed: (" . $mysqli->errno . ") " . $mysqli->error;
-}
-if (!$stmt->execute()) {
-    echo "Execute failed: (" . $mysqli->errno . ") " . $mysqli->error;
-}
-
-$stmt->bind_result($id);
-$userId = 0;
-while ($stmt->fetch()) {
-    $userId = $id;
-}
-
-$result = $mysqli->query("SELECT COUNT(*) FROM `match`");
-$row = $result->fetch_row();
-//echo '#: ', $row[0];
-$match = $row[0] + 1;
-
-//checks if there are any matches, and if not, creates a new one
-if ($row[0] == 0) {
-    //echo "Creating a new match";
-    if (!$stmt = $mysqli->prepare("INSERT INTO `match` (`id`, `uid`) VALUES (?, ?)")){
-      echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
     }
-    if (!$stmt->bind_param("ii", $match, $userId)) {
-      echo "Binding output parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+    if (!($stmt->bind_param("i", $tmp))){
+        echo "Binding parameters failed: (" . $mysqli->errno . ") " . $mysqli->error;
     }
-    //var_dump($stmt);
     if (!$stmt->execute()) {
-      echo "Execute failed: (" . $mysqli->errno . ") " . $mysqli->error;
+        echo "Execute failed: (" . $mysqli->errno . ") " . $mysqli->error;
     }
-} else {
-    //echo $userId;
-    if (!$stmt = $mysqli->prepare("INSERT INTO `match` (`id`, `uid`) VALUES (?, ?)")){
-      echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+
+    $stmt->bind_result($quest);
+    while ($stmt->fetch()) {
+        array_push($questions, $quest);
     }
-    if (!$stmt->bind_param("ii", $match, $userId)) {
-      echo "Binding output parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+    
+    if (!($stmt = $mysqli->prepare("SELECT `answer` FROM `answers` WHERE `qid` = ? ORDER BY rand()"))) {
+    echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
     }
-    ////var_dump($stmt);
+    if (!($stmt->bind_param("i", $tmp))){
+        echo "Binding parameters failed: (" . $mysqli->errno . ") " . $mysqli->error;
+    }
     if (!$stmt->execute()) {
-      echo "Execute failed: (" . $mysqli->errno . ") " . $mysqli->error;
+        echo "Execute failed: (" . $mysqli->errno . ") " . $mysqli->error;
+    }
+
+    $stmt->bind_result($ans);
+    while ($stmt->fetch()) {
+        array_push($answers, $ans);
     }
 }
 
@@ -132,7 +102,6 @@ $mysqli->close();
 <script>
 $(function () {
     var qNum = 1;
-    var radioBtn;
     var qcounter = 0;
     var acounter = 0;
     var cur = 0;
@@ -143,16 +112,15 @@ $(function () {
     var answers = <?php echo json_encode($answers);?>;
     var questions = <?php echo json_encode($questions);?>;
     var username = <?php echo json_encode($username);?>;
-    var match = <?php echo json_encode($match);?>;
     $('#next').click(function () {
         //console.log(qcounter);
-        if (qcounter == 19){
+        $("form div").removeClass();
+        if (qcounter == 4){
             $('#next').click(function () {
-                if (correct > 12){
-                    $("#score").html(correct + " hooray!");
+                $("#score").html(correct + "/5");
+                if (correct > 2){
                     $('#picture').attr("src", "win.gif");
                 } else {
-                    $("#score").html(correct + " boo!");
                     $('#picture').attr("src", "insult.gif");
                 }
                 $('#question').remove();
@@ -161,7 +129,7 @@ $(function () {
                 $('#answer3').remove();
                 $('#answer4').remove();
                 $('#questionNum').remove();
-                //changes the button to 'play again' when 20 questions have finished
+                //changes the button to 'play again' when 10 questions have finished
                 $('#next').html('Play again');
                 $('#next').show();
                 if ($('#next').click(function () {
@@ -204,24 +172,22 @@ $(function () {
                 url: 'verifyAnswer.php',
                 data: {
                   question: question,
-                  answer: answer,
-                  match: match
+                  answer: answer
                 }
             //done function to show result if user got it right or wrong
             }).done(function(message){
                 var result = JSON.parse(message);
-                //console.log(curQuestion);
-                if (result.status == 'right') {
+                $("form div:contains('" + answer + "')").addClass("selectedAns");
+                $("form div:contains('" + result.correct_ans + "')").addClass("correctAns");
+                //console.log(result.correct_ans);
+                //console.log(answer);
+                if (result.correct_ans == answer) {
                   $('#next').show();
                   $('#picture').attr("src", "right.gif");
-                  //console.log('right');
-                  //console.log(result.message);
                   correct++;
-                }else if(result.status == 'wrong'){
+                }else{
                   $('#next').show();
                   $('#picture').attr("src", "wrong.gif");
-                  //console.log('wrong');
-                  //console.log(result.message);
                 }
             });
         });
