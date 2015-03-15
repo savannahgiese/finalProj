@@ -7,6 +7,7 @@ body{
 	background:#ccc;
 	border-radius: 20px;
 	text-align: center;
+	padding-bottom:20px;
 }
 #header{
 	background:#FBE08F;
@@ -76,21 +77,36 @@ body{
 #profilePic{
 	height:auto; 
 	width:auto; 
-	max-width:150px; 
-	max-height:150px;
+	max-width:200px; 
+	max-height:200px;
 }
-#img {
-   width: 10em;  
-   height: 2em;
-   cursor:pointer;
+a {
+	text-align:left;
+  display:inline-block;
+  position:relative;
+  border:0;
+  padding:0;
+  color:#000;
+  text-decoration:underline;
 }
-.matches {
-    display:inline-block;
-    position:relative;
-    background-color: transparent;
-    cursor: pointer;
-    border:0;
-    padding:0;
-    color:#000;
-    text-decoration:underline;
+#pic {
+	text-align:left;
+  display:inline-block;
+  position:relative;
+  padding:0;
+}
+.selectedAns {
+	background-color: red;
+}
+.correctAns {
+	background-color: green;
+}
+table, td {
+  border: 1px solid black;
+  text-align: center;
+  margin: 0 auto;
+  background-color: white;
+}
+thead{
+  font-weight:bold;
 }
