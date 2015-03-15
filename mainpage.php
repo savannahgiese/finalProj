@@ -31,10 +31,10 @@ if(isset($_SESSION['username']) && $_SESSION['username'] !='') {
           <legend>LOG-IN HERE</legend>
           <form action="" method="POST" id="authentication" name="authentication">
             <label for="username">Username:</label>
-            <input type="text" name="username" id="username" size=40/>
+            <input type="text" name="username" id="username" size=40>
             <label for="password">Password:</label>
-            <input type="password" name="password" id="password" size=40/>
-            <input type="submit" id="login" value="Login" />
+            <input type="password" name="password" id="password" size=40>
+            <input type="submit" id="login" value="Login"/>
           </form>
           <div id="error"></div>
         </fieldset>
@@ -42,33 +42,33 @@ if(isset($_SESSION['username']) && $_SESSION['username'] !='') {
       </p>
     </div>
   </div>
-  <script>
-    $(document).ready(function() {
-      $('#authentication').submit(function(event) {
-        event.preventDefault();
-        var username = $('#username').val();
-        var password = $("#password").val();
-        //console.log(username);
-        $.ajax({
-          type: "POST",
-          url: 'verifyLogin.php',
-          data: {
-            username: username,
-            password: password
-          }
-        }).done(function(message){
-          var result = JSON.parse(message);
-          if (result.status == 'success') {
-            //console.log('successful!');
-            window.location.replace('welcome.php');
-          } else {
-            var obj = JSON.parse(message);
-            $('#error').html(obj.error_message);
-          }
-        });
+<script>
+  $(document).ready(function() {
+    $('#authentication').submit(function(event) {
+      event.preventDefault();
+      var username = $('#username').val();
+      var password = $("#password").val();
+      //console.log(username);
+      $.ajax({
+        type: "POST",
+        url: 'verifyLogin.php',
+        data: {
+          username: username,
+          password: password
+        }
+      }).done(function(message){
+        var result = JSON.parse(message);
+        if (result.status == 'success') {
+          //console.log('successful!');
+          window.location.replace('welcome.php');
+        } else {
+          var obj = JSON.parse(message);
+          $('#error').html(obj.error_message);
+        }
       });
     });
-  </script>
+  });
+</script>
 </body>
 <!-- 'success' => NULL, 'username' => NULL, 'blank_user' => NULL, 'blank_password' => NULL, 
 'user_taken' => NULL, 'action' => $_POST['value'] -->
