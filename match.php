@@ -44,7 +44,7 @@ include 'database.php';
                 if (!($stmt = $mysqli->prepare("SELECT questions.question FROM `questions` 
                 INNER JOIN `answers` ON answers.qid = questions.id INNER JOIN `completed_answers` 
                 ON completed_answers.aid = answers.id INNER JOIN `match` 
-                ON match.id = completed_answers.mid WHERE match.id = ?"))) {
+                ON match.id = completed_answers.mid WHERE match.id = ? ORDER BY questions.id"))) {
                 echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
                 }
                 if (!($stmt->bind_param("i", $match))){
@@ -63,7 +63,7 @@ include 'database.php';
                 if (!($stmt = $mysqli->prepare("SELECT answers.answer FROM  `answers` 
                 INNER JOIN  `completed_answers` ON completed_answers.aid = answers.id
                 INNER JOIN  `match` ON match.id = completed_answers.mid
-                WHERE match.id = ?"))) {
+                WHERE match.id = ? ORDER BY answers.qid"))) {
                 echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
                 }
                 if (!($stmt->bind_param("i", $match))){
@@ -78,10 +78,14 @@ include 'database.php';
                     array_push($userAns, $uAns);
                 }
                 
-                if (!($stmt = $mysqli->prepare("SELECT answers.answer FROM `answers` 
-                INNER JOIN `completed_answers` 
-                ON completed_answers.aid = answers.id INNER JOIN `match` 
-                ON match.id = completed_answers.mid WHERE match.id = ? AND answers.correct = 1"))) {
+                //finds all the correct answers for each question in the match
+                if (!($stmt = $mysqli->prepare("SELECT answer FROM `answers` WHERE correct = 1 AND qid IN
+                (SELECT questions.id
+                FROM  `questions` 
+                INNER JOIN  `answers` ON questions.id = answers.qid
+                INNER JOIN  `completed_answers` ON answers.id = completed_answers.aid
+                INNER JOIN  `match` ON match.id = completed_answers.mid
+                WHERE match.id = ?) ORDER BY qid"))) {
                 echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
                 }
                 if (!($stmt->bind_param("i", $match))){

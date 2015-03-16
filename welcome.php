@@ -25,7 +25,7 @@ session_start();
     if(session_status() == PHP_SESSION_ACTIVE){
     if(isset($_SESSION['username']) && $_SESSION['username'] != NULL){
     $username = $_SESSION['username'];
-    if (!($stmt = $mysqli->prepare("SELECT `nickname` FROM `users` WHERE username = ?"))) {
+    if (!($stmt = $mysqli->prepare("SELECT `username` FROM `users` WHERE username = ?"))) {
             echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
     }
     if (!($stmt->bind_param("s", $username))){

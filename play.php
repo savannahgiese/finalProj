@@ -49,7 +49,7 @@ include 'database.php';
 <?php 
 $username = $_SESSION['username'];
 $random = array();
-for($num = 0; $num < 20; $num++){
+for($num = 0; $num < 5; $num++){
     $q = rand(1, 20);
     if (in_array($q, $random)){
         $num--;
@@ -91,10 +91,54 @@ for($q = 0; $q < 5; $q++){
 
     $stmt->bind_result($ans);
     while ($stmt->fetch()) {
+        //echo "Answer is: " . $ans;
         array_push($answers, $ans);
     }
 }
+//checks how many matches there are
+if (!($stmt = $mysqli->prepare("SELECT COUNT(*) FROM `match` INNER JOIN users ON users.id = match.uid WHERE users.username = ?"))){
+    echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+}
+if (!($stmt->bind_param("s", $username))){
+    echo "Binding parameters failed: (" . $mysqli->errno . ") " . $mysqli->error;
+}
+if (!$stmt->execute()) {
+    echo "Execute failed: (" . $mysqli->errno . ") " . $mysqli->error;
+}
+$stmt->bind_result($id);
+$match = 0;
+while ($stmt->fetch()) {
+    $match = $id;
+}
+$match++;
+//gets userid
+if (!($stmt = $mysqli->prepare("SELECT `id` FROM `users` WHERE username = ?"))) {
+    echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+}
+if (!($stmt->bind_param("s", $username))){
+    echo "Binding parameters failed: (" . $mysqli->errno . ") " . $mysqli->error;
+}
+if (!$stmt->execute()) {
+    echo "Execute failed: (" . $mysqli->errno . ") " . $mysqli->error;
+}
 
+$stmt->bind_result($id);
+$userId = 0;
+while ($stmt->fetch()) {
+    $userId = $id;
+}
+
+//adds a new match
+if (!$stmt = $mysqli->prepare("INSERT INTO `match` (`matchNum`, `uid`) VALUES (?, ?)")){
+  echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+}
+if (!$stmt->bind_param("ii", $match, $userId)) {
+  echo "Binding output parameters failed: (" . $stmt->errno . ") " . $stmt->error;
+}
+////var_dump($stmt);
+if (!$stmt->execute()) {
+  echo "Execute failed: (" . $mysqli->errno . ") " . $mysqli->error;
+}
 $mysqli->close();
 ?>
 </div>
@@ -112,6 +156,7 @@ $(function () {
     var answers = <?php echo json_encode($answers);?>;
     var questions = <?php echo json_encode($questions);?>;
     var username = <?php echo json_encode($username);?>;
+    var match = <?php echo json_encode($match);?>;
     $('#next').click(function () {
         //console.log(qcounter);
         $("form div").removeClass();
@@ -167,25 +212,31 @@ $(function () {
             //ajax call to send over the question id, user answer, and username 
             //to use php/mysql to check answer
             //console.log(answer);
+            //console.log(match);
+            //console.log(question);
             $.ajax({
                 type: "POST",
                 url: 'verifyAnswer.php',
                 data: {
                   question: question,
-                  answer: answer
+                  answer: answer,
+                  match: match
                 }
             //done function to show result if user got it right or wrong
             }).done(function(message){
                 var result = JSON.parse(message);
+                //console.log(result.message);
                 $("form div:contains('" + answer + "')").addClass("selectedAns");
                 $("form div:contains('" + result.correct_ans + "')").addClass("correctAns");
                 //console.log(result.correct_ans);
                 //console.log(answer);
                 if (result.correct_ans == answer) {
+                    //console.log(result.message);
                   $('#next').show();
                   $('#picture').attr("src", "right.gif");
                   correct++;
                 }else{
+                    //console.log(result.message);
                   $('#next').show();
                   $('#picture').attr("src", "wrong.gif");
                 }

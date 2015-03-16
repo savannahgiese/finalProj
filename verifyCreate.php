@@ -42,6 +42,16 @@ if ($username == "" || $password == ""){
     if (!$stmt->execute()) {
       echo "Execute failed: (" . $mysqli->errno . ") " . $mysqli->error;
     }
+    $pic = "defaultProfile.jpg";
+    if (!($stmt = $mysqli->prepare("UPDATE `users` SET `picture` = (?) WHERE `username` = ?"))) {
+        echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error;
+    }
+    if (!($stmt->bind_param("ss", $pic, $username))){
+        echo "Binding parameters failed: (" . $mysqli->errno . ") " . $mysqli->error;
+    }
+    if (!$stmt->execute()) {
+        echo "Execute failed: (" . $mysqli->errno . ") " . $mysqli->error;
+    }
     $results['status'] = 'success';
     $results['username'] = $username;
     $_SESSION['username'] = $username;
